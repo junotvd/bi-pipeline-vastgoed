@@ -1,0 +1,31 @@
+# Plaats dit bestand in je repo op: .github/workflows/scrape.yml
+# Zet SUPABASE_URL en SUPABASE_KEY als Secrets in:
+# GitHub repo -> Settings -> Secrets and variables -> Actions
+
+name: Scrape Immo Lot
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # elke dag om 06:00 UTC
+  workflow_dispatch:        # laat je ook handmatig runnen via de GitHub UI
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests pandas beautifulsoup4 supabase
+
+      - name: Run pipeline
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: python pipeline.py
